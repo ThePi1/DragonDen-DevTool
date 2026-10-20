@@ -20,7 +20,7 @@ public class ItemService : IItemService
     {
         try
         {
-            var itemFactory = Singleton<ItemFactoryClass>.Instance;
+            var itemFactory = Singleton<EFT.ItemFactory>.Instance;
             if (itemFactory?.ItemTemplates == null)
                 return Array.Empty<ItemTemplate>();
 
@@ -64,7 +64,7 @@ public class ItemService : IItemService
     {
         try
         {
-            var itemFactory = Singleton<ItemFactoryClass>.Instance;
+            var itemFactory = Singleton<EFT.ItemFactory>.Instance;
 
             var itemTpl = itemFactory?.ItemTemplates?
                 .Select(kv => kv.Value)
@@ -143,14 +143,14 @@ public class ItemService : IItemService
     {
         try
         {
-            var itemFactory = Singleton<ItemFactoryClass>.Instance;
+            var itemFactory = Singleton<EFT.ItemFactory>.Instance;
             var gameWorld = Singleton<GameWorld>.Instance;
-            var poolManager = Singleton<PoolManagerClass>.Instance;
+            var poolManager = Singleton<EFT.ObjectsFactory>.Instance;
 
             if (itemFactory == null || !gameWorld || !player)
             {
                 Plugin.Logger.LogError("[DevTool] Drop Failed: Missing ItemFactoryClass/GameWorld or Player.");
-                NotificationManagerClass.DisplayMessageNotification("[DevTool] Drop failed: Missing ItemFactoryClass/GameWorld or Player.");
+                EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Drop failed: Missing ItemFactoryClass/GameWorld or Player.");
                 return;
             }
 
@@ -162,7 +162,7 @@ public class ItemService : IItemService
             if (probe == null)
             {
                 Plugin.Logger.LogError("[DevTool] Drop Failed: CreateItem returned null.");
-                NotificationManagerClass.DisplayMessageNotification("[DevTool] Drop failed: CreateItem returned null.");
+                EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Drop failed: CreateItem returned null.");
                 return;
             }
 
@@ -174,9 +174,9 @@ public class ItemService : IItemService
             {
                 await poolManager.LoadBundlesAndCreatePools(
                     0,
-                    PoolManagerClass.AssemblyType.Local,
+                    EFT.ObjectsFactory.AssemblyType.Local,
                     keys.ToArray(),
-                    JobPriorityClass.Immediate,
+                    Diz.Jobs.JobYieldPriority.Immediate,
                     null,
                     CancellationToken.None
                 );
@@ -228,12 +228,12 @@ public class ItemService : IItemService
                 remaining -= thisStack;
             }
 
-            NotificationManagerClass.DisplayMessageNotification($"[DevTool] Dropped {(stack <= 1 ? "item" : $"{stack} items (stacked)")}: {templateId}");
+            EFT.Communications.NotificationManager.DisplayMessageNotification($"[DevTool] Dropped {(stack <= 1 ? "item" : $"{stack} items (stacked)")}: {templateId}");
         }
         catch (Exception e)
         {
             Plugin.Logger?.LogError($"[Items] Drop exception: {e}");
-            NotificationManagerClass.DisplayMessageNotification("[DevTool] Drop failed: " + e.Message);
+            EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Drop failed: " + e.Message);
         }
     }
 }

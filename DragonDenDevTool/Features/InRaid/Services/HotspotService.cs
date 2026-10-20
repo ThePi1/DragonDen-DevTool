@@ -190,7 +190,7 @@ public sealed class HotspotService : IHotspotService
         if (string.IsNullOrEmpty(spot.MapId)) spot.MapId = CurrentMapId();
         if (string.IsNullOrEmpty(spot.Category)) spot.Category = "Favourite";
         _favorites.Add(spot);
-        NotificationManagerClass.DisplayMessageNotification($"[DevTool] Added {spot.Name} to Favorites");
+        EFT.Communications.NotificationManager.DisplayMessageNotification($"[DevTool] Added {spot.Name} to Favorites");
         SaveFavorites();
     }
 
@@ -206,7 +206,7 @@ public sealed class HotspotService : IHotspotService
             (hotspot.Position - hotspotToRemove.Position).sqrMagnitude < 0.0001f);
 
         if (indexInAll >= 0) _favorites.RemoveAt(indexInAll);
-        NotificationManagerClass.DisplayMessageNotification($"[DevTool] Removed  {hotspotToRemove.Name} from Favorites");
+        EFT.Communications.NotificationManager.DisplayMessageNotification($"[DevTool] Removed  {hotspotToRemove.Name} from Favorites");
         SaveFavorites();
     }
 }

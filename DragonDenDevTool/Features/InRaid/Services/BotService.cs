@@ -10,6 +10,8 @@ using UnityEngine;
 
 namespace DragonDenDevTool.Features.InRaid.Services;
 
+
+using Utils = DragonDenDevTool.Utilities.Utils;
 public class BotService : IBotService
 {
     public async Task<bool> SpawnBotAsync(WildSpawnType role, int amount)
@@ -22,14 +24,14 @@ public class BotService : IBotService
 
             if (botsController == null || spawner == null || !botsController.IsEnable)
             {
-                NotificationManagerClass.DisplayMessageNotification("[DevTool] Bot spawner not available.");
+                EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Bot spawner not available.");
                 return false;
             }
 
             amount = Mathf.Clamp(amount, 1, 50);
-            NotificationManagerClass.DisplayMessageNotification($"[DevTool] Attempting to spawn {role} x{amount}, please wait...");
+            EFT.Communications.NotificationManager.DisplayMessageNotification($"[DevTool] Attempting to spawn {role} x{amount}, please wait...");
 
-            var wave = new BotWaveDataClass
+            var wave = new EFT.SpawnWave
             {
                 BotsCount = amount,
                 Side = (EPlayerSide)4,
@@ -43,14 +45,14 @@ public class BotService : IBotService
             };
 
             await spawner.ActivateBotsByWave(wave);
-            NotificationManagerClass.DisplayMessageNotification($"[DevTool] Spawned {role} x{amount}");
+            EFT.Communications.NotificationManager.DisplayMessageNotification($"[DevTool] Spawned {role} x{amount}");
             await Task.CompletedTask;
             return true;
         }
         catch (Exception e)
         {
             Plugin.Logger.LogError($"[DevTool] Error spawning bot: {e.Message}");
-            NotificationManagerClass.DisplayMessageNotification("[DevTool] Spawn failed.. See Console.");
+            EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Spawn failed.. See Console.");
             return false;
         }
     }
@@ -101,7 +103,7 @@ public class BotService : IBotService
                 TeleportUtils.SafeTeleport(player,bot);
             }
 
-            NotificationManagerClass.DisplayMessageNotification("[DevTool] Teleported all bots to you.");
+            EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Teleported all bots to you.");
         }
         catch
         {
@@ -121,7 +123,7 @@ public class BotService : IBotService
             {
                 if (bot.IsYourPlayer) return;
                 var pInfo = bot.Profile.Info;
-                if (!pInfo.EplayerSide_0.Equals(type)) continue;
+                if (!pInfo.Side.Equals(type)) continue;
                 
                 TeleportUtils.SafeTeleport(bot, player);
             }
@@ -142,12 +144,12 @@ public class BotService : IBotService
             var target = gameWorld.RegisteredPlayers.FirstOrDefault(x => x is Player p && p.ProfileId == playerId) as Player;
             if (!target) return;
             TeleportUtils.SafeTeleport(player, target);
-            NotificationManagerClass.DisplayMessageNotification("[DevTool] Teleported " + (target.Profile != null ? target.Profile.Nickname : target.ProfileId) + " to you.");
+            EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Teleported " + (target.Profile != null ? target.Profile.Nickname : target.ProfileId) + " to you.");
         }
         catch (Exception e)
         {
             Plugin.Logger.LogError($"[DevTool] Error while teleporting {playerId} to you: {e.Message}");
-            NotificationManagerClass.DisplayMessageNotification("[DevTool] Error while teleporting bot.. See Console");
+            EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Error while teleporting bot.. See Console");
         }
     }
 
@@ -161,12 +163,12 @@ public class BotService : IBotService
             var target = gameWorld.RegisteredPlayers.FirstOrDefault(x => x is Player p && p.ProfileId == playerId) as Player;
             if (!target) return;
             TeleportUtils.SafeTeleport(target,player);
-            NotificationManagerClass.DisplayMessageNotification("[DevTool] Teleported you to " + (target.Profile != null ? target.Profile.Nickname : target.ProfileId));
+            EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Teleported you to " + (target.Profile != null ? target.Profile.Nickname : target.ProfileId));
         }
         catch (Exception e)
         {
             Plugin.Logger.LogError($"[DevTool] Error while teleporting you:  {e.Message}");
-            NotificationManagerClass.DisplayMessageNotification("[DevTool] Error while teleporting you to you.. See Console.");
+            EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Error while teleporting you to you.. See Console.");
         }
     }
 
@@ -178,19 +180,19 @@ public class BotService : IBotService
             var target = gameWorld?.RegisteredPlayers.FirstOrDefault(x => x is Player p && p.ProfileId == playerId) as Player;
             if (!target)
             {
-                NotificationManagerClass.DisplayMessageNotification("[DevTool] Player not found.");
+                EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Player not found.");
                 return false;
             }
 
-            var damage = new DamageInfoStruct { Damage = 9999f, DamageType = EDamageType.Bullet, StaminaBurnRate = 0f, BleedBlock = true };
+            var damage = new EFT.Ballistics.DamageInfo { Damage = 9999f, DamageType = EDamageType.Bullet, StaminaBurnRate = 0f, BleedBlock = true };
             target.ApplyDamageInfo(damage, EBodyPart.Head, EBodyPartColliderType.HeadCommon, 0f);
-            NotificationManagerClass.DisplayMessageNotification($"[DevTool] Killed {target.Profile.Nickname}.");
+            EFT.Communications.NotificationManager.DisplayMessageNotification($"[DevTool] Killed {target.Profile.Nickname}.");
             return true;
         }
         catch (Exception e)
         {
             Plugin.Logger.LogError($"[DevTool] Error while teleporting {playerId}: {e.Message}");
-            NotificationManagerClass.DisplayMessageNotification("[DevTool] Kill failed.. See Console.");
+            EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Kill failed.. See Console.");
             return false;
         }
     }
@@ -207,7 +209,7 @@ public class BotService : IBotService
                 if (!player || player.IsYourPlayer) continue;
                 try
                 {
-                    var damage = new DamageInfoStruct { Damage = 9999f, DamageType = EDamageType.Bullet, StaminaBurnRate = 0f, BleedBlock = true };
+                    var damage = new EFT.Ballistics.DamageInfo { Damage = 9999f, DamageType = EDamageType.Bullet, StaminaBurnRate = 0f, BleedBlock = true };
                     player.ApplyDamageInfo(damage, EBodyPart.Head, EBodyPartColliderType.HeadCommon, 0f);
                     killed++;
                 }
@@ -217,13 +219,13 @@ public class BotService : IBotService
                 }
             }
 
-            NotificationManagerClass.DisplayMessageNotification($"[DevTool] Killed {killed} bots.");
+            EFT.Communications.NotificationManager.DisplayMessageNotification($"[DevTool] Killed {killed} bots.");
             return killed;
         }
         catch (Exception e)
         {
             Plugin.Logger.LogError($"[DevTool] Kill All failed:  {e.Message}");
-            NotificationManagerClass.DisplayMessageNotification("[DevTool] Kill All failed.. See Console.");
+            EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Kill All failed.. See Console.");
             return 0;
         }
     }
@@ -245,7 +247,7 @@ public class BotService : IBotService
                         type == EBotType.Scavs && player.Profile.Side == EPlayerSide.Savage || 
                         type == EBotType.Bosses && pInfo.Settings.IsBoss())
                     {
-                        var damage = new DamageInfoStruct { Damage = 9999f, DamageType = EDamageType.Bullet, StaminaBurnRate = 0f, BleedBlock = true };
+                        var damage = new EFT.Ballistics.DamageInfo { Damage = 9999f, DamageType = EDamageType.Bullet, StaminaBurnRate = 0f, BleedBlock = true };
                         player.ApplyDamageInfo(damage, EBodyPart.Head, EBodyPartColliderType.HeadCommon, 0f);
                         killed++;
                     }
@@ -253,17 +255,17 @@ public class BotService : IBotService
                 catch (Exception e)
                 {
                     Plugin.Logger.LogError($"[DevTool] Error while killing {player.Profile.Nickname}: {e.Message}");
-                    NotificationManagerClass.DisplayMessageNotification($"[DevTool] Killing  {player.Profile.Nickname} failed.. See Console."); 
+                    EFT.Communications.NotificationManager.DisplayMessageNotification($"[DevTool] Killing  {player.Profile.Nickname} failed.. See Console."); 
                 }
             }
 
-            NotificationManagerClass.DisplayMessageNotification($"[DevTool] Killed {killed} {type.ToString()}.");
+            EFT.Communications.NotificationManager.DisplayMessageNotification($"[DevTool] Killed {killed} {type.ToString()}.");
             return killed;
         }
         catch (Exception e)
         {
             Plugin.Logger.LogError($"[DevTool] Kill All {type.ToString()} failed:  {e.Message}");
-            NotificationManagerClass.DisplayMessageNotification($"[DevTool] Kill All {type.ToString()} failed.. See Console.");
+            EFT.Communications.NotificationManager.DisplayMessageNotification($"[DevTool] Kill All {type.ToString()} failed.. See Console.");
             return 0;
         }
     }

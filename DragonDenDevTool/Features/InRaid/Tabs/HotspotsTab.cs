@@ -91,7 +91,7 @@ public sealed class HotspotsTab : IDevTab
             _queueReloadJsons = false;
             _svc.LoadFavorites();
             if (_svc is HotspotService hs) hs.ReloadGlobalsForCurrentMap();
-            NotificationManagerClass.DisplayMessageNotification("[DevTool] Reloaded favourites and globals");
+            EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Reloaded favourites and globals");
         }
 
         if (_queueAddFav)
@@ -276,6 +276,6 @@ public sealed class HotspotsTab : IDevTab
 
         var up = Mathf.Max(0.05f, _yLift);
         TeleportUtils.SafeTeleport(me, hs.Position, up);
-        NotificationManagerClass.DisplayMessageNotification($"[DevTool] Teleported to {hs.Name}");
+        EFT.Communications.NotificationManager.DisplayMessageNotification($"[DevTool] Teleported to {hs.Name}");
     }
 }
