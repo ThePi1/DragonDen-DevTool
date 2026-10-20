@@ -182,6 +182,33 @@ public class ItemService : IItemService
                 );
             }
 
+            if (FikaBridge.Present)
+            {
+                // Fika: a loose item created on one machine exists only there, and the host rejects picking it up.
+                // Spawn into our own inventory instead and let Fika create the same item for the host and everyone else.
+                int spawned = 0, spawnedStacks = 0;
+                string failure = null;
+                var left = Mathf.Max(1, stack);
+                while (left > 0)
+                {
+                    var count = Mathf.Min(left, maxPerStack);
+                    if (!FikaBridge.SpawnInInventory(player, templateId, count, out failure)) break;
+                    spawned += count;
+                    spawnedStacks++;
+                    left -= count;
+                }
+
+                if (spawned > 0)
+                    EFT.Communications.NotificationManager.DisplayMessageNotification($"[DevTool] Added {spawned} x {templateId} to your inventory" +
+                        (left > 0 ? $" ({left} didn't fit: {failure})" : "") + ".");
+                else
+                {
+                    Plugin.Logger.LogError($"[DevTool] Fika item spawn failed: {failure}");
+                    EFT.Communications.NotificationManager.DisplayMessageNotification($"[DevTool] Spawn failed: {failure}.");
+                }
+                return;
+            }
+
             var headPos = player.PlayerBones.Head.Original.position;
             var forward = player.Transform.forward;
             var rotation = player.Transform.rotation;

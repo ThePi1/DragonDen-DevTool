@@ -18,6 +18,11 @@ public class BotService : IBotService
     {
         try
         {
+            if (FikaBridge.IsClient)
+            {
+                EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Only the raid host can spawn bots in a Fika raid.");
+                return false;
+            }
             var botGame = Singleton<IBotGame>.Instance;
             var botsController = botGame?.BotsController;
             var spawner = botsController?.BotSpawner;
@@ -95,11 +100,16 @@ public class BotService : IBotService
     {
         try
         {
+            if (FikaBridge.IsClient)
+            {
+                EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Only the raid host can move bots in a Fika raid.");
+                return;
+            }
             var gameWorld = Singleton<GameWorld>.Instance;
             if (!gameWorld || !player) return;
             foreach (var bot in gameWorld.RegisteredPlayers.OfType<Player>())
             {
-                if (bot.IsYourPlayer) continue;
+                if (!FikaBridge.IsBot(bot)) continue; // never move other human players
                 TeleportUtils.SafeTeleport(player,bot);
             }
 
@@ -115,13 +125,18 @@ public class BotService : IBotService
     {
         try
         {
+            if (FikaBridge.IsClient)
+            {
+                EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Only the raid host can move bots in a Fika raid.");
+                return;
+            }
             var gameWorld = Singleton<GameWorld>.Instance;
             if (!gameWorld) return;
             var player = gameWorld.MainPlayer;
             
             foreach (var bot in gameWorld.RegisteredPlayers.OfType<Player>())
             {
-                if (bot.IsYourPlayer) return;
+                if (!FikaBridge.IsBot(bot)) continue;
                 var pInfo = bot.Profile.Info;
                 if (!pInfo.Side.Equals(type)) continue;
                 
@@ -138,6 +153,11 @@ public class BotService : IBotService
     {
         try
         {
+            if (FikaBridge.IsClient)
+            {
+                EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Only the raid host can move bots in a Fika raid.");
+                return;
+            }
             var gameWorld = Singleton<GameWorld>.Instance;
             var player = gameWorld?.MainPlayer;
             if (!gameWorld || !player) return;
@@ -184,14 +204,13 @@ public class BotService : IBotService
                 return false;
             }
 
-            var damage = new EFT.Ballistics.DamageInfo { Damage = 9999f, DamageType = EDamageType.Bullet, StaminaBurnRate = 0f, BleedBlock = true };
-            target.ApplyDamageInfo(damage, EBodyPart.Head, EBodyPartColliderType.HeadCommon, 0f);
+            FikaBridge.Kill(target);
             EFT.Communications.NotificationManager.DisplayMessageNotification($"[DevTool] Killed {target.Profile.Nickname}.");
             return true;
         }
         catch (Exception e)
         {
-            Plugin.Logger.LogError($"[DevTool] Error while teleporting {playerId}: {e.Message}");
+            Plugin.Logger.LogError($"[DevTool] Error while killing {playerId}: {e}");
             EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Kill failed.. See Console.");
             return false;
         }
@@ -206,11 +225,10 @@ public class BotService : IBotService
             var killed = 0;
             foreach (var player in gameWorld.RegisteredPlayers.OfType<Player>())
             {
-                if (!player || player.IsYourPlayer) continue;
+                if (!FikaBridge.IsBot(player) || !player.HealthController.IsAlive) continue; // never other human players
                 try
                 {
-                    var damage = new EFT.Ballistics.DamageInfo { Damage = 9999f, DamageType = EDamageType.Bullet, StaminaBurnRate = 0f, BleedBlock = true };
-                    player.ApplyDamageInfo(damage, EBodyPart.Head, EBodyPartColliderType.HeadCommon, 0f);
+                    FikaBridge.Kill(player);
                     killed++;
                 }
                 catch
@@ -239,7 +257,7 @@ public class BotService : IBotService
             var killed = 0;
             foreach (var player in gameWorld.RegisteredPlayers.OfType<Player>())
             {
-                if (!player || player.IsYourPlayer) continue;
+                if (!FikaBridge.IsBot(player) || !player.HealthController.IsAlive) continue; // never other human players
                 try
                 {
                     var pInfo = player.Profile.Info;
@@ -247,8 +265,7 @@ public class BotService : IBotService
                         type == EBotType.Scavs && player.Profile.Side == EPlayerSide.Savage || 
                         type == EBotType.Bosses && pInfo.Settings.IsBoss())
                     {
-                        var damage = new EFT.Ballistics.DamageInfo { Damage = 9999f, DamageType = EDamageType.Bullet, StaminaBurnRate = 0f, BleedBlock = true };
-                        player.ApplyDamageInfo(damage, EBodyPart.Head, EBodyPartColliderType.HeadCommon, 0f);
+                        FikaBridge.Kill(player);
                         killed++;
                     }
                 }
