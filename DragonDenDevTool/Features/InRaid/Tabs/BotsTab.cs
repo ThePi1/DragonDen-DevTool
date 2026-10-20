@@ -154,7 +154,7 @@ public sealed class BotsTab : IDevTab
                     if (!int.TryParse(_spawnAmtStr, out var amt)) amt = 1;
                     _ = _bots.SpawnBotAsync(wst, Mathf.Clamp(amt, 1, 50));
                 }
-                else NotificationManagerClass.DisplayMessageNotification("[DevTool] Invalid role.");
+                else EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Invalid role.");
 
                 _suppressRefreshUntil = Time.realtimeSinceStartup + InteractionSuppress;
             }

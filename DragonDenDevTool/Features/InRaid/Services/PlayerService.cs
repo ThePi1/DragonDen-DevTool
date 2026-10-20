@@ -39,7 +39,7 @@ public class PlayerService : IPlayerService
                 offset += 0.75f;
             }
 
-            NotificationManagerClass.DisplayMessageNotification("[DevTool] Teleported all to you.");
+            EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Teleported all to you.");
         }
         catch
         {
@@ -146,7 +146,7 @@ public class PlayerService : IPlayerService
         var pos = player.Transform.position;
         string name = player.Profile.Nickname;
         string side = player.Profile.Side.ToString();
-        string lvl = InfoClass.GetLevel(player.Profile.Experience).ToString();
+        string lvl = EFT.ProfileInfo.GetLevel(player.Profile.Experience).ToString();
 
         return new Structs.PlayerInfo
         {

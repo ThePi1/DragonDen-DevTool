@@ -135,7 +135,7 @@ public sealed class HotspotMakerTab : IDevTab
         var me = GamePlayerOwner.MyPlayer;
         if (!me)
         {
-            NotificationManagerClass.DisplayMessageNotification("[DevTool] No Player Found... This is weird!?");
+            EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] No Player Found... This is weird!?");
             Plugin.Logger.LogError("[DevTool] No Player Found... This is weird!?");
             return;
         }
@@ -153,7 +153,7 @@ public sealed class HotspotMakerTab : IDevTab
         _x = pos.x.ToString("0.###", CultureInfo.InvariantCulture);
         _y = pos.y.ToString("0.###", CultureInfo.InvariantCulture);
         _z = pos.z.ToString("0.###", CultureInfo.InvariantCulture);
-        NotificationManagerClass.DisplayMessageNotification($"Fetched Position {_x},{_y},{_z}");
+        EFT.Communications.NotificationManager.DisplayMessageNotification($"Fetched Position {_x},{_y},{_z}");
     }
 
     void TryTeleportPreview()
@@ -162,14 +162,14 @@ public sealed class HotspotMakerTab : IDevTab
         if (!player)
         {
             Plugin.Logger.LogError("[DevTool] No Player Found... This is weird!?");
-            NotificationManagerClass.DisplayMessageNotification("[DevTool] No Player Found... This is weird!?");
+            EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] No Player Found... This is weird!?");
             return;
         }
 
         if (!TryParseFields(out var pos))
         {
             Plugin.Logger.LogError("[DevTool] Invalid  Fields in Position");
-            NotificationManagerClass.DisplayMessageNotification("[DevTool] Invalid Fields in Position");
+            EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Invalid Fields in Position");
             return;
         }
 
@@ -180,7 +180,7 @@ public sealed class HotspotMakerTab : IDevTab
         var rot = player.Transform.rotation.eulerAngles;
         player.Transform.rotation = Quaternion.Euler(rot);
 
-        NotificationManagerClass.DisplayMessageNotification($"[DevTool] Teleported to {tp}");
+        EFT.Communications.NotificationManager.DisplayMessageNotification($"[DevTool] Teleported to {tp}");
     }
 
     void AddToFile(string path)
@@ -190,14 +190,14 @@ public sealed class HotspotMakerTab : IDevTab
         if (!TryParseFields(out var pos))
         {
             Plugin.Logger.LogError("[DevTool] Invalid  Fields in Position");
-            NotificationManagerClass.DisplayMessageNotification("[DevTool] Invalid Fields in Position");
+            EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Invalid Fields in Position");
             return;
         }
 
         if (string.IsNullOrWhiteSpace(_mapId))
         {
             Plugin.Logger.LogError("[DevTool] No Map ID found");
-            NotificationManagerClass.DisplayMessageNotification("[DevTool] No Map ID found");
+            EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] No Map ID found");
             return;
         }
 
@@ -216,12 +216,12 @@ public sealed class HotspotMakerTab : IDevTab
             DevPaths.EnsureFolders();
             if (!File.Exists(path)) WriteNewFileWith(entry, path);
             else InsertEntry(path, entry);
-            NotificationManagerClass.DisplayMessageNotification($"Added {_name} for {_mapId}.");
+            EFT.Communications.NotificationManager.DisplayMessageNotification($"Added {_name} for {_mapId}.");
         }
         catch (Exception ex)
         {
             Plugin.Logger.LogError("[DevTool] Failed to add to file: " + ex.Message);
-            NotificationManagerClass.DisplayMessageNotification("[DevTool] Failed to add to file.. See Console.");
+            EFT.Communications.NotificationManager.DisplayMessageNotification("[DevTool] Failed to add to file.. See Console.");
         }
     }
 

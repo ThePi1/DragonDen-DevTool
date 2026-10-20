@@ -87,7 +87,7 @@ internal static class SettingExtensions
         {
             onChange(configEntry.Value);
             if (notification)
-                NotificationManagerClass.DisplayMessageNotification($"[DragonDenDevTool] Setting {configEntry.Value} changed to {configEntry.Value}");
+                EFT.Communications.NotificationManager.DisplayMessageNotification($"[DragonDenDevTool] Setting {configEntry.Value} changed to {configEntry.Value}");
         };
     }
 

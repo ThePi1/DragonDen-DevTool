@@ -56,18 +56,6 @@ public static class LocalizationUtils
     );
   }
 
-  public static string GetBestItemLabel(ItemClass ic, bool preferShort = false)
-  {
-    if (ic == null) return "??????";
-    var item = ic.Item;
-    if (item != null) return GetBestItemLabel(item, preferShort);
-
-    var tpl = TryGetTemplate(ic.TemplateId);
-    if (tpl != null) return GetBestItemLabel(tpl, preferShort);
-
-    return preferShort ? FirstNonEmpty(ic.ShortName, ic.Name, ic.TemplateId) : FirstNonEmpty(ic.Name, ic.ShortName, ic.TemplateId);
-  }
-
   public static string GetBestItemLabelByTpl(string tplId, bool preferShort = false)
   {
     if (string.IsNullOrEmpty(tplId)) return "??????";
@@ -79,7 +67,7 @@ public static class LocalizationUtils
   {
     try
     {
-      var fac = Singleton<ItemFactoryClass>.Instance;
+      var fac = Singleton<EFT.ItemFactory>.Instance;
       if (fac == null || fac.ItemTemplates == null) return null;
       return fac.ItemTemplates.TryGetValue((MongoID)tplId, out var tpl) ? tpl : null;
     }

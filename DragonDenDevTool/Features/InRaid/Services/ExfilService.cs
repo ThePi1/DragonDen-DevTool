@@ -10,13 +10,15 @@ using UnityEngine;
 
 namespace DragonDenDevTool.Features.InRaid.Services;
 
+
+using Utils = DragonDenDevTool.Utilities.Utils;
 public class ExfilService : IExfilService
 {
     public event Action<ExfiltrationPoint> OnStatusChanged;
 
     public ExfilService()
     {
-        var exfilController = ExfiltrationControllerClass.Instance;
+        var exfilController = CommonAssets.Scripts.Game.ExfiltrationController.Instance;
         if (exfilController != null)
             exfilController.StatusChanged += Exfil_StatusChanged;
     }
@@ -35,7 +37,7 @@ public class ExfilService : IExfilService
 
     public (ExfiltrationPoint[] pmc, ScavExfiltrationPoint[] scav, SecretExfiltrationPoint[] secret) GetCurrentExfil()
     {
-        var exfilController = ExfiltrationControllerClass.Instance;
+        var exfilController = CommonAssets.Scripts.Game.ExfiltrationController.Instance;
         if (exfilController == null)
             return (Array.Empty<ExfiltrationPoint>(), Array.Empty<ScavExfiltrationPoint>(), Array.Empty<SecretExfiltrationPoint>());
 
